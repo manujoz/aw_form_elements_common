@@ -234,7 +234,7 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		// Quitamos el elemento del registro
 
 		if( !this.noregister && this.parentForm ) {
-			this.parentForm._unregisterElement( this.$.input );
+			this.parentForm._unregister_element( this.$.input );
 		}
 		
 		Polymer.Tactil.remove( this.slider, 'track', this._handleTrack.bind( this ));
