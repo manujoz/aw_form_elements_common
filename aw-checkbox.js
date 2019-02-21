@@ -285,7 +285,7 @@ class AwCheckBox extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunct
 		// Quitamos el elemento del registro
 
 		if( !this.noregister && this.parentForm ) {
-			this.parentForm._unregisterElement( this.$.input );
+			this.parentForm._unregister_element( this.$.input );
 		}
 	}
 	
