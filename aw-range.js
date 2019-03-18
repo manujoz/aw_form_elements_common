@@ -13,6 +13,7 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 					padding-top: 15px;
 					margin-bottom: 2px;
 					background-color: var(--aw-input-range-bg-color, white);
+					vertical-align: var(--aw-input-vertical-align, middle);
 					display: inline-block;
 					-webkit-user-select: none;
 					-moz-user-select: none;
@@ -27,10 +28,11 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 					position: absolute;
 					top: -16px !important;
 					left: 0px !important;
-					color: var(--aw-input-label-color,var(--aw-input-placeholder-color,#888888));
-					font-family: var(--aw-input-font-family, "arial");
-					font-size: 12px;
-					font-weight: normal;
+					color: var(--aw-input-range-label-color,var(--aw-input-label-color,var(--aw-input-placeholder-color,#888888)));
+					font-family: var(--aw-input-range-label-font-family,var(--aw-input-font-family, "arial"));
+					font-size: var(--aw-input-range-label-font-size,12px);
+					font-weight: var(--aw-input-range-label-font-weight,normal);
+					text-align: var(--aw-input-range-label-text-align,left);
 					white-space: nowrap;
 					transition: color .2s;
 				}
@@ -347,7 +349,7 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * 
 	 * Ajusto el value del componente.
 	 */
-	_adjustValue() {			
+	_adjustValue() {
 		// Calculamos los valores necesarios
 		
 		var ancho = this.contenedor.offsetWidth;
