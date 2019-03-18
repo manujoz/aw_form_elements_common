@@ -14,6 +14,7 @@ class AwCheckBox extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunct
 					width: 150px;
 					display: inline-block;
 					padding-bottom: var(--aw-input-padding-bottom, 12px);
+					vertical-align: var(--aw-input-vertical-align, middle);
 					cursor: pointer;
 					-webkit-user-select: none;
 					-moz-user-select: none;
@@ -122,6 +123,7 @@ class AwCheckBox extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunct
 					font-size: var(--aw-checkbox-label-font-size,var(--aw-font-size,16px));
 					font-style: var(--aw-checkbox-label-font-style,normal);
 					font-weight: var(--aw-checkbox-label-font-weight,300);
+					text-align: var(--aw-checkbox-label-text-align,left);
 				}
 				#label[error] {
 					color: var(--aw-input-error-color,var(--aw-error-color,#b13033));
@@ -136,6 +138,7 @@ class AwCheckBox extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunct
 					border-top: var(--aw-checkbox-subtitle-border,solid 1px #DDDDDD);
 					font-size: var(--aw-checkbox-subtitle-size,12px);
 					color: var(--aw-checkbox-subtitle-color,#888888);
+					text-align: var(--aw-checkbox-subtitle-text-align,left);
 				}
 				#subtitle[error] {
 					color: var(--aw-input-error-color,var(--aw-error-color,#b13033));
