@@ -13,6 +13,7 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 					position: relative;
 					width: 30px;
 					display: inline-block;
+					vertical-align: var(--aw-input-vertical-align, middle);
 					-webkit-user-select: none;
 					-moz-user-select: none;
 					-khtml-user-select: none;
