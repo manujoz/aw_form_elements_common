@@ -435,11 +435,11 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		
 		if( this.orStep - Math.floor(this.orStep ) === 0 ) {
 			// Es entero
-			this.val1 = Math.round( value1 );
+			this.val1 = Math.round( value1 ) + this.min;
 		} else {
 			divsMovidas = parseInt(newLeft / anchoDiv);
 			value1 = divsMovidas * this.step;
-			this.val1 = parseFloat( value1.toFixed( 1 ));
+			this.val1 = parseFloat( value1.toFixed( 1 )) + this.min;
 		}
 		
 		// Cogemos el valor del slider 2
@@ -453,11 +453,11 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		
 		if( this.orStep - Math.floor(this.orStep ) === 0 ) {
 			// Es entero
-			this.val2 = Math.round( value2 );
+			this.val2 = Math.round( value2 ) + this.min;
 		} else {
 			divsMovidas = parseInt(newLeft / anchoDiv);
 			value2 = divsMovidas * this.step;
-			this.val2 = parseFloat( value2.toFixed( 1 ));
+			this.val2 = parseFloat( value2.toFixed( 1 )) + this.min;
 		}
 		
 		this.value = this.val1 + "-" + this.val2;
