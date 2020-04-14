@@ -106,8 +106,9 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 					display: flex;
 					align-items: center;
 					justify-content: flex-start;
-					font-size: 14px;
-					padding-bottom: 2px;
+					font-size: var(--aw-input-range-font-size, 14px);
+					font-weight: var(--aw-input-range-font-weight, normal);
+					padding: var(--aw-input-range-value-padding, 0 0 2px 0);
 					-webkit-box-sizing: border-box;
 					-moz-box-sizing: border-box;
 					-ms-box-sizing: border-box;
