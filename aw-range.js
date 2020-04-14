@@ -353,9 +353,12 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		// Calculamos los valores necesarios
 		
 		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
+		var diff = this.max;
 		var anchoDiv = (ancho / diff) * this.step;
+		
+		if( this.step > 0 && this.step < 1 ) {
+			anchoDiv = anchoDiv * 10;
+		}
 		
 		// Calculamo el newLeft
 		
