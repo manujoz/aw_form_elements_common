@@ -389,11 +389,11 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		
 		if( this.orStep - Math.floor(this.orStep ) === 0 ) {
 			// Es entero
-			this.value = Math.round( value );
+			this.value = Math.round( value ) + this.min;
 		} else {
 			divsMovidas = parseInt(newLeft / anchoDiv);
 			value = divsMovidas * this.step;
-			this.value = parseFloat( value.toFixed( 1 ));
+			this.value = parseFloat( value.toFixed( 1 )) + this.min;
 		}
 	}
 	
