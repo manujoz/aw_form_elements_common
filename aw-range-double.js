@@ -392,13 +392,17 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		// Calculamos los valores necesarios
 		
 		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
+		var diff = this.max;
 		var anchoDiv = (ancho / diff) * this.step;
+		
+		if( this.step > 0 && this.step < 1 ) {
+			anchoDiv = anchoDiv * 10;
+		}
 		
 		// Calculamo el newLeft del slider1
 		
-		var leftSlider1 = (this.val1 - this.min) * anchoDiv;
-		var leftSlider2 = (this.val2 - this.min) * anchoDiv;
+		var leftSlider1 = this.val1 * anchoDiv;
+		var leftSlider2 = this.val1 * anchoDiv;
 		if( this.orStep !== this.step ) {
 			leftSlider1 = this.val1 / this.step;
 			leftSlider2 = this.val2 / this.step;
