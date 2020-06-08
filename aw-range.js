@@ -200,11 +200,11 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		this.bar = this.$.bar;
 		this.slider = this.$.slider;
 		this.divValue = this.shadowRoot.querySelector( ".cont_value" );
+		this.tracking = false;
 		
 		// Ajustes del componente
 		
-		this.startLeft = 0; // Indica la posición inicial al empezar a deslizar el slider
-		this.orStep = this.step; // Indica el step original antes de ser ajustado
+		this.left = 0; // Indica la posición izquierda en la que está el elemento deslizador
 		
 		// Ajustamos los atributos
 		
@@ -253,6 +253,16 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		if( this.min > this.max ) {
 			this.max = this.min + 10;
 		}
+
+		// Nos aseguramos de tratar con solo un decimal
+
+		if( this.min % 1 != 0 ) {
+			this.min = parseFloat( this.min.toFixed( 1 ));
+		}
+
+		if( this.max % 1 != 0 ) {
+			this.max = parseFloat( this.max.toFixed( 1 ));
+		}
 		
 		// Ajustamos la división de value y el ancho del slider
 		
@@ -286,15 +296,12 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		
 		// Ponemos el value
 		
-		if( !this.value ) {
+		if( !this.value || this.value < this.min ) {
 			this.value = this.min;
-		}
-		
-		if( this.value < this.min ) {
-			this.min = this.value;
-		}
-		if ( this.value > this.max ) {
-			this.max = this.value;
+		} else if ( this.value > this.max ) {
+			this.value = this.max;
+		} else if( this.value % 1 != 0 ) {
+			this.value = parseFloat( this.value.toFixed( 1 ));
 		}
 	}
 	
@@ -326,23 +333,8 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * Ajusta los pasos del componente.
 	 */
 	_adjustStep() {
-		// Calculamos los valores necesarios
-		
-		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
-		
-		// Si hay más divisiones que ancho reajustamos el step
-		
-		if( divisiones > ancho ) {
-			var step = diff / ancho;
-			this.step = parseFloat(step.toFixed( 2 ));
-			divisiones = diff / this.step;
-		}
-		
-		while( divisiones > ancho ) {
-			this.step = this.step + 0.1;
-			divisiones = diff / this.step;
+		if( this.step % 1 != 0 ) {
+			this.step = parseFloat( this.step.toFixed( 1 ));
 		}
 	}
 	
@@ -355,24 +347,18 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		// Calculamos los valores necesarios
 		
 		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max;
-		var anchoDiv = (ancho / diff) * this.step;
-		
-		if( this.step > 0 && this.step < 1 ) {
-			anchoDiv = anchoDiv * 10;
-		}
+		var diff = this.max - this.min;
+		var anchoDiv = ancho / diff;
 		
 		// Calculamo el newLeft
 		
-		var newLeft = this.value * anchoDiv;
-		if( this.orStep !== this.step ) {
-			newLeft = this.value / this.step;
-		}
+		var newLeft = (this.value - this.min) * anchoDiv;
+		this.left = parseFloat( newLeft.toFixed( 3 ));
 		
 		// Movemos el slider
 		
-		this.bar.style.width = newLeft + "px";
-		this.slider.style.left = newLeft + "px";
+		this.bar.style.width = this.left + "px";
+		this.slider.style.left = this.left + "px";
 	}
 	
 	/**
@@ -381,24 +367,34 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * Obtiene el value del input.
 	 */
 	_getValue() {
-		var newLeft = parseInt( window.getComputedStyle( this.slider, null ).getPropertyValue( "left" ).replace( "px", "" ));
-		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
-		var anchoDiv = (ancho / diff) * this.step;
-		var divsMovidas = newLeft / anchoDiv;
-		
-		var value = divsMovidas * this.step;
-		
-		// Comprobamos si el step original es enetero para ajustar el value
-		
-		if( this.orStep - Math.floor(this.orStep ) === 0 ) {
-			// Es entero
-			this.value = Math.round( value ) + this.min;
+		let ancho = this.contenedor.offsetWidth;
+		let diff = this.max - this.min;
+		let divs = diff / this.step;
+		let anchoDiv = 1;
+
+		if( divs < ancho ) {
+			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
+			this.value = parseFloat((((this.left / anchoDiv) * this.step) + this.min).toFixed( 3 ));
 		} else {
-			divsMovidas = parseInt(newLeft / anchoDiv);
-			value = divsMovidas * this.step;
-			this.value = parseFloat( value.toFixed( 1 )) + this.min;
+			let pixelValue = diff / ancho;
+			let value = (this.left * pixelValue) + this.min;
+
+			if( this.step % 1 == 0 ) {
+				value = parseInt( value );
+				while( value % this.step != 0 ) {
+					value++;
+				}
+			} else {
+				let step = this.step * 10;
+				value = parseFloat( value.toFixed( 1 ));
+				value = value * 10;
+				while( value % step != 0 ) {
+					value++;
+				}
+				value = value / 10;
+			}
+
+			this.value = value;
 		}
 	}
 	
@@ -436,8 +432,7 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * Comienza el movimiento táctil.
 	 */
 	_startTrack() {
-		this.startLeft = parseInt( window.getComputedStyle( this.slider, null ).getPropertyValue( "left" ).replace( "px", "" ));
-		
+		//this.startLeft = parseFloat( window.getComputedStyle( this.slider, null ).getPropertyValue( "left" ).replace( "px", "" ));
 		this.divValue.setAttribute( "focused", "" );
 		this.$.label.setAttribute( "focused", "" );
 	}
@@ -448,38 +443,40 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * Función que controla el movimiento táctil.
 	 */
 	_tracking( detail ) {
+		this.tracking = true;
+
 		// Calculamos los valores necesarios
-		
-		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
-		var anchoDiv = parseInt((ancho / diff) * this.step);
-		var divsMovidas = parseInt( detail.dx / anchoDiv );
-		
-		// Calculmaos el nuevo left
-		
-		var newLeft = divsMovidas * anchoDiv + this.startLeft;
-		
-		// Ajustamos el left
+		let ancho = this.contenedor.offsetWidth;
+		let anchoBola = this.contenedor.querySelector( "#slider > div" ).offsetWidth / 2;
+		let diff = this.max - this.min;
+		let divs = diff / this.step;
+		let anchoDiv = 1;
+		if( divs < ancho ) {
+			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
+		}
+		let divsMovidas = parseInt(( detail.x - anchoBola ) / anchoDiv );
+
+		// Calculamos el nuevo left
+		let newLeft = divsMovidas * anchoDiv;
 		
 		if( newLeft < 0 ) {
 			newLeft = 0;
-			divsMovidas = 0;
+		} else if( newLeft > ancho ) {
+			newLeft = ancho;
 		}
+
+		// Asignamos el left del slider
 		
-		if( newLeft > this.contenedor.offsetWidth ) {
-			newLeft = this.contenedor.offsetWidth;
-			divsMovidas = divisiones;
-		}
+		this.left = parseFloat( newLeft.toFixed( 3 ));
 		
 		// Movemos el slider
 		
-		this.bar.style.width = newLeft + "px";
-		this.slider.style.left = newLeft + "px";
+		this.bar.style.width = this.left + "px";
+		this.slider.style.left = this.left + "px";
 		
 		// Obtenemos el value
 		
-		this._getValue( newLeft, divsMovidas );
+		this._getValue();
 	}
 	
 	/**
@@ -496,6 +493,10 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		
 		this.divValue.removeAttribute( "focused" );
 		this.$.label.removeAttribute( "focused" );
+
+		setTimeout(() => {
+			this.tracking = false;
+		}, 200);
 	}
 
 	/**
@@ -521,22 +522,24 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * Acciones a realizar cuandl se hace click sobre el campo.
 	 */
 	_click( ev ) {
-		if( ev.target.id !== "bar" && ev.target.id !== "cont_slider" ) {
-			return false;
+		if(( ev.target.id !== "bar" && ev.target.id !== "cont_slider" ) || this.tracking ) {
+			return;
 		}
 		
 		var ancho = this.contenedor.offsetWidth;
 		var diff = this.max - this.min;
 		var divisiones = diff / this.step;
-		var anchoDiv = (ancho / diff) * this.step;
+		var anchoDiv = parseFloat(((ancho / diff) * this.step).toFixed(3));
 		var divsMovidas = Math.round( ev.layerX / anchoDiv );
 		
 		var newLeft = divsMovidas * anchoDiv;
+
+		this.left = parseFloat( newLeft.toFixed( 3 ));
 		
 		// Movemos el slider
 		
-		this.bar.style.width = newLeft + "px";
-		this.slider.style.left = newLeft + "px";
+		this.bar.style.width = this.left + "px";
+		this.slider.style.left = this.left + "px";
 		
 		this._getValue();
 	}

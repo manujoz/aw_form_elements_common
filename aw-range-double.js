@@ -226,8 +226,8 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		
 		// Ajustes del componente
 		
-		this.startLeft = 0; // Indica la posición inicial al empezar a deslizar el slider
-		this.orStep = this.step; // Indica el step original antes de ser ajustado
+		this.left1 = 0; // Indica la posición izquierda en la que está el elemento deslizador
+		this.left2 = this.contenedor.offsetWidth; // Indica la posición izquierda en la que está el elemento deslizador
 		
 		// Ajustamos los atributos
 		
@@ -277,6 +277,16 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		if( this.min > this.max ) {
 			this.max = this.min + 10;
 		}
+
+		// Nos aseguramos de tratar con solo un decimal
+		
+		if( this.min % 1 != 0 ) {
+			this.min = parseFloat( this.min.toFixed( 1 ));
+		}
+
+		if( this.max % 1 != 0 ) {
+			this.max = parseFloat( this.max.toFixed( 1 ));
+		}
 		
 		// Ajustamos la división de value y el ancho del slider
 		
@@ -308,6 +318,7 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 			this.divValue_2.style.width = ancho + "px";
 			this.contenedor.style.left = ( 5 + ancho ) + "px";
 			this.contenedor.style.width = "calc(100% - " + (17 + ( ancho * 2 )) + "px)";
+			this.left2 = this.contenedor.offsetWidth;
 		}
 		
 		// Ponemos el value
@@ -318,22 +329,22 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 			this.value = this.val1 + "-" + this.val2;
 		} else {
 			var sv = this.value.split( "-" );
-			this.val1 = parseFloat(sv[ 0 ]);
-			this.val2 = parseFloat(sv[ 1 ]);
+			this.val1 = parseFloat( sv[ 0 ].toFixed( 1 ));
+			this.val2 = parseFloat( sv[ 1 ].toFixed( 1 ));
 			
 			if( this.val1 > this.val2 ) {
-				this.val1 = parseFloat(sv[ 1 ]);
-				this.val2 = parseFloat(sv[ 0 ]);
+				this.val1 = parseFloat( sv[ 1 ].toFixed( 1 ));
+				this.val2 = parseFloat( sv[ 0 ].toFixed( 1 ));
 			}
 		}
 		
 		// Reajustamos min y max si es necesario
 		
 		if( this.min > this.val1 ) {
-			this.min = this.val1;
+			this.val1 = this.min;
 		}
 		if( this.max < this.val2 ) {
-			this.max = this.val2;
+			this.val2 = this.max;
 		}
 	}
 	
@@ -365,23 +376,8 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 	 * Ajusta los pasos del componente.
 	 */
 	_adjustStep() {
-		// Calculamos los valores necesarios
-		
-		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
-		
-		// Si hay más divisiones que ancho reajustamos el step
-		
-		if( divisiones > ancho ) {
-			var step = diff / ancho;
-			this.step = parseFloat(step.toFixed( 2 ));
-			divisiones = diff / this.step;
-		}
-		
-		while( divisiones > ancho ) {
-			this.step = this.step + 0.1;
-			divisiones = diff / this.step;
+		if( this.step % 1 != 0 ) {
+			this.step = parseFloat( this.step.toFixed( 1 ));
 		}
 	}
 	
@@ -392,32 +388,31 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 	 */
 	_adjustValue() {
 		// Calculamos los valores necesarios
-		
+
 		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max;
-		var anchoDiv = (ancho / diff) * this.step;
+		var diff = this.max - this.min;
+		var anchoDiv = ancho / diff;
 		
 		if( this.step > 0 && this.step < 1 ) {
 			anchoDiv = anchoDiv * 10;
 		}
 		
 		// Calculamo el newLeft del slider1
+
+		let leftSlider1 = (this.val1 - this.min) * anchoDiv;
+		this.left1 = parseFloat( leftSlider1.toFixed( 3 ));
 		
-		var leftSlider1 = this.val1 * anchoDiv;
-		var leftSlider2 = this.val1 * anchoDiv;
-		if( this.orStep !== this.step ) {
-			leftSlider1 = this.val1 / this.step;
-			leftSlider2 = this.val2 / this.step;
-		}
+		// Calculamo el newLeft del slider1
+
+		let leftSlider2 = (this.val2 - this.min) * anchoDiv;
+		this.left2 = parseFloat( leftSlider2.toFixed( 3 ));
 		
 		// Movemos el slider
 		
-		this.slider_1.style.left = leftSlider1 + "px";
-		this.slider_2.style.left = leftSlider2 + "px";
-		this.bar.style.left = leftSlider1 + "px";
-		this.bar.style.width = (leftSlider2 - leftSlider1) + "px";
-		
-		//this.bar.style.width = newLeft + "px";
+		this.slider_1.style.left = this.left1 + "px";
+		this.slider_2.style.left = this.left2 + "px";
+		this.bar.style.left = this.left1 + "px";
+		this.bar.style.width = (this.left2 - this.left1) + "px";
 	}
 	
 	/**
@@ -426,46 +421,64 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 	 * Obtiene el value del input.
 	 */
 	_getValue() {
-		// Cogemos el valor del slider 1
-		
-		var newLeft = parseInt( window.getComputedStyle( this.slider_1, null ).getPropertyValue( "left" ).replace( "px", "" ));
-		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
-		var anchoDiv = (ancho / diff) * this.step;
-		var divsMovidas = newLeft / anchoDiv;
-		
-		var value1 = (divsMovidas * this.step) + this.min;
-		
-		// Comprobamos si el step original es enetero para ajustar el value
-		
-		if( this.orStep - Math.floor(this.orStep ) === 0 ) {
-			// Es entero
-			this.val1 = Math.round( value1 ) + this.min;
+		let ancho = this.contenedor.offsetWidth;
+		let diff = this.max - this.min;
+		let divs = diff / this.step;
+		let anchoDiv = 1;
+
+		if( divs < ancho ) {
+			// Obtenmos cual es el ancho de cada división
+			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
+
+			// Calculamos los valores en función al ancho de la división
+			this.val1 = parseFloat((((this.left1 / anchoDiv) * this.step) + this.min).toFixed( 3 ));
+			this.val2 = parseFloat((((this.left2 / anchoDiv) * this.step) + this.min).toFixed( 3 ));
 		} else {
-			divsMovidas = parseInt(newLeft / anchoDiv);
-			value1 = divsMovidas * this.step;
-			this.val1 = parseFloat( value1.toFixed( 1 )) + this.min;
+			// Obtenemos el valor del pixel
+			let pixelValue = diff / ancho;
+
+			// Calculamos los valores en función al valor del pixel
+			let val1 = (this.left1 * pixelValue) + this.min;
+			let val2 = (this.left2 * pixelValue) + this.min;
+
+			// Si el paso es un entero o un decimal
+			if( this.step % 1 == 0 ) {
+				// Ajsutamos el valor 1 a un múltiplo de los pasos
+				val1 = parseInt( val1 );
+				while( val1 % this.step != 0 ) {
+					val1++;
+				}
+
+				// Ajustamos el valor 2 a un múltiplo de los pasos
+				val2 = parseInt( val2 );
+				while( val1 % this.step != 0 ) {
+					val2++;
+				}
+			} else {
+				let step = this.step * 10;
+
+				// Ajsutamos el valor 1 a un múltiplo de los pasos
+				val1 = parseFloat( val1.toFixed( 1 ));
+				val1 = val1 * 10;
+				while( val1 % step != 0 ) {
+					val1++;
+				}
+				val1 = val1 / 10;
+
+				// Ajustamos el valor 2 a un múltiplo de los pasos
+				val2 = parseFloat( val2.toFixed( 1 ));
+				val2 = val2 * 10;
+				while( val2 % step != 0 ) {
+					val2++;
+				}
+				val2 = val2 / 10;
+			}
+
+			this.val1 = val1;
+			this.val2 = val2;
 		}
 		
-		// Cogemos el valor del slider 2
-		
-		newLeft = parseInt( window.getComputedStyle( this.slider_2, null ).getPropertyValue( "left" ).replace( "px", "" ));
-		divsMovidas = newLeft / anchoDiv;
-		
-		var value2 = divsMovidas * this.step + this.min;
-		
-		// Comprobamos si el step original es enetero para ajustar el value
-		
-		if( this.orStep - Math.floor(this.orStep ) === 0 ) {
-			// Es entero
-			this.val2 = Math.round( value2 ) + this.min;
-		} else {
-			divsMovidas = parseInt(newLeft / anchoDiv);
-			value2 = divsMovidas * this.step;
-			this.val2 = parseFloat( value2.toFixed( 1 )) + this.min;
-		}
-		
+		// Asignamos el value
 		this.value = this.val1 + "-" + this.val2;
 	}
 	
@@ -507,10 +520,8 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		this.currentSlider = response.target;
 		
 		if( this.currentSlider === this.slider_1 ) {
-			this.startLeft = parseInt( window.getComputedStyle( this.slider_1, null ).getPropertyValue( "left" ).replace( "px", "" ));
 			this.divValue_1.setAttribute( "focused", "" );
 		} else if( this.currentSlider === this.slider_2 ) {
-			this.startLeft = parseInt( window.getComputedStyle( this.slider_2, null ).getPropertyValue( "left" ).replace( "px", "" ));
 			this.divValue_2.setAttribute( "focused", "" );
 		}
 		
@@ -522,57 +533,54 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 	 * 
 	 * Función que controla el movimiento táctil.
 	 */
-	_tracking( response ) {			
+	_tracking( detail ) {	
 		// Calculamos los valores necesarios
+		let ancho = this.contenedor.offsetWidth;
+		let anchoBola = this.contenedor.querySelector( "#slider1 > div" ).offsetWidth * 1.5;
+		let diff = this.max - this.min;
+		let divs = diff / this.step;
+		let anchoDiv = 1;
+		if( divs < ancho ) {
+			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
+		}
 		
-		var ancho = this.contenedor.offsetWidth;
-		var diff = this.max - this.min;
-		var divisiones = diff / this.step;
-		var anchoDiv = parseInt((ancho / diff) * this.step);
-		var divsMovidas = parseInt( response.dx / anchoDiv );
-		
-		// Calculmaos el nuevo left
-		
-		var newLeft = divsMovidas * anchoDiv + this.startLeft;
-		
-		// Ajustamos el left
+		let divsMovidas = parseInt(( detail.x - anchoBola ) / anchoDiv );
+
+		// Calculamos el nuevo left
+		let newLeft = divsMovidas * anchoDiv;
 		
 		if( newLeft < 0 ) {
 			newLeft = 0;
-			divsMovidas = 0;
+		} else if( newLeft > ancho ) {
+			newLeft = ancho;
 		}
-		
-		if( newLeft > this.contenedor.offsetWidth ) {
-			newLeft = this.contenedor.offsetWidth;
-			divsMovidas = divisiones;
-		}
-		
-		// Movemos el slider
-		
+
+		// Hacemos los cálculos para el slider 1
 		if( this.currentSlider === this.slider_1 ) {
-			var leftSlider2 = parseInt( window.getComputedStyle( this.slider_2, null ).getPropertyValue( "left" ).replace( "px", "" ));
-			
-			if( newLeft >= leftSlider2 ) {
-				newLeft = leftSlider2;
+			if( parseFloat( newLeft.toFixed( 3 )) >= this.left2 ) {
+				newLeft = this.left2 - anchoDiv;
 			}
+
+			this.left1 = parseFloat( newLeft.toFixed( 3 ));
 			
-			this.bar.style.left = newLeft + "px";
-			this.bar.style.width = (leftSlider2 - newLeft) + "px";
-			this.slider_1.style.left = newLeft + "px";
-		} else if( this.currentSlider === this.slider_2 ) {
-			var leftSlider1 = parseInt( window.getComputedStyle( this.slider_1, null ).getPropertyValue( "left" ).replace( "px", "" ));
-			
-			if( newLeft <= leftSlider1 ) {
-				newLeft = leftSlider1;
-			}
-			
-			this.bar.style.width = (newLeft - leftSlider1) + "px";
-			this.slider_2.style.left = newLeft + "px";
+			this.bar.style.left = this.left1 + "px";
+			this.bar.style.width = (this.left2 - this.left1) + "px";
+			this.slider_1.style.left = this.left1 + "px";
 		}
 		
-		// Obtenemos el value
-		
-		this._getValue( newLeft, divsMovidas );
+		// Hacemos los cálculos para el slider 2
+		if( this.currentSlider === this.slider_2 ) {
+			if( parseFloat( newLeft.toFixed( 3 )) <= this.left1 ) {
+				newLeft = this.left1 + anchoDiv;
+			}
+			
+			this.left2 = parseFloat( newLeft.toFixed( 3 ));
+			
+			this.bar.style.width = (this.left2 - this.left1) + "px";
+			this.slider_2.style.left = this.left2 + "px";
+		}
+
+		this._getValue();
 	}
 	
 	/**
