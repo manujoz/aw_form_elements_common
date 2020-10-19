@@ -269,6 +269,18 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 	}
 
 	/**
+	 * @method get_value
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	get_value()
+	{
+		return this.inputElement.value;
+	}
+
+	/**
 	 * @method	_setAttributes
 	 * 
 	 * Asigna los atributos del componente.
@@ -520,8 +532,10 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		this.currentSlider = response.target;
 		
 		if( this.currentSlider === this.slider_1 ) {
+			this.startLeft = this.left1;
 			this.divValue_1.setAttribute( "focused", "" );
 		} else if( this.currentSlider === this.slider_2 ) {
+			this.startLeft = this.left2;
 			this.divValue_2.setAttribute( "focused", "" );
 		}
 		
@@ -536,7 +550,6 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 	_tracking( detail ) {	
 		// Calculamos los valores necesarios
 		let ancho = this.contenedor.offsetWidth;
-		let anchoBola = this.contenedor.querySelector( "#slider1 > div" ).offsetWidth * 1.5;
 		let diff = this.max - this.min;
 		let divs = diff / this.step;
 		let anchoDiv = 1;
@@ -544,7 +557,7 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
 		}
 		
-		let divsMovidas = parseInt(( detail.x - anchoBola ) / anchoDiv );
+		let divsMovidas = parseInt(( detail.dx + this.startLeft ) / anchoDiv );
 
 		// Calculamos el nuevo left
 		let newLeft = divsMovidas * anchoDiv;

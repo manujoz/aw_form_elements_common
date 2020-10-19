@@ -291,6 +291,72 @@ class AwCheckBox extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunct
 			this.parentForm._unregister_element( this.$.input );
 		}
 	}
+
+	/**
+	 * @method	checked
+	 * 
+	 * Indica si el input está checkeado o no
+	 * 
+	 * @return {boolean}
+	 */
+	checked()
+	{
+		if( this.inputElement.hasAttribute( "checked" )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @method error_hide
+	 * 
+	 * Muestra u oculta un mensaje de error
+	 */
+	error_hide()
+	{
+		this.inputElement.setAttribute( "errmsg", "" );
+	}
+
+	/**
+	 * @method error_show
+	 * 
+	 * Muestra u oculta un mensaje de error
+	 * 
+	 * @param {string} message Mensaje de error que se va a mostrar
+	 */
+	error_show( message )
+	{
+		this.inputElement.setAttribute( "errmsg", message );
+	}
+
+	/**
+	 * @method get_value
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	get_value()
+	{
+		return this.inputElement.value;
+	}
+
+	/**
+	 * @method	has_error
+	 * 
+	 * Devuelve si el campo tiene un error
+	 * 
+	 * @return {boolean}
+	 */
+	has_error()
+	{
+		if( this.inputElement.getAttribute( "errmsg" )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	/**
 	 * @method	_changeDisabled
