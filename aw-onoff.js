@@ -176,6 +176,34 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	}
 
 	/**
+	 * @method	checked
+	 * 
+	 * Indica si el input está checkeado o no
+	 * 
+	 * @return {boolean}
+	 */
+	checked()
+	{
+		if( this.inputElement.hasAttribute( "checked" )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @method get_value
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	get_value()
+	{
+		return this.inputElement.value;
+	}
+
+	/**
 	 * @method	_set
 	 * 
 	 * Activa el botón si está checado al iniciar.

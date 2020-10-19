@@ -245,6 +245,18 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	}
 
 	/**
+	 * @method get_value
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	get_value()
+	{
+		return this.inputElement.value;
+	}
+
+	/**
 	 * @method	_setAttributes
 	 * 
 	 * Asigna los atributos del componente.
@@ -432,7 +444,7 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 * Comienza el movimiento táctil.
 	 */
 	_startTrack() {
-		//this.startLeft = parseFloat( window.getComputedStyle( this.slider, null ).getPropertyValue( "left" ).replace( "px", "" ));
+		this.startLeft = this.left;
 		this.divValue.setAttribute( "focused", "" );
 		this.$.label.setAttribute( "focused", "" );
 	}
@@ -447,15 +459,14 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 
 		// Calculamos los valores necesarios
 		let ancho = this.contenedor.offsetWidth;
-		let anchoBola = this.contenedor.querySelector( "#slider > div" ).offsetWidth / 2;
 		let diff = this.max - this.min;
 		let divs = diff / this.step;
 		let anchoDiv = 1;
 		if( divs < ancho ) {
 			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
 		}
-		let divsMovidas = parseInt(( detail.x - anchoBola ) / anchoDiv );
-
+		let divsMovidas = parseInt(( detail.dx + this.startLeft ) / anchoDiv );
+		
 		// Calculamos el nuevo left
 		let newLeft = divsMovidas * anchoDiv;
 		

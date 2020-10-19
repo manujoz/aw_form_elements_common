@@ -311,6 +311,34 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 		this.observerCheck.disconnect();
 		this.observerDisabled.disconnect();
 	}
+
+	/**
+	 * @method	checked
+	 * 
+	 * Indica si el input está checkeado o no
+	 * 
+	 * @return {boolean}
+	 */
+	checked()
+	{
+		if( this.inputElement.hasAttribute( "checked" )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @method get_value
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	get_value()
+	{
+		return this.inputElement.value;
+	}
 	
 	/**
 	 * @method	_change
