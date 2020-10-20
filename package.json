@@ -1,11 +1,15 @@
 {
 	"name": "aw_form_elements_common",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"description": "Componentes de formulario comunes Arisman Webs",
 	"keywords": [
-	  	"Arisman Webs"
+		"Polymer",
+		"Web Components",
+		"Forms Polymer",
+		"Forms web components",
+		"Inputs web components"
 	],
-	"author": "Arisman Webs",
+	"author": "Manu Overa",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/manujoz/aw_form_elements_common.git"
@@ -19,5 +23,6 @@
 		"aw_form_helpers": "^2.0.0",
 		"aw_form_mixins": "^2.0.0"
 	},
+	"types": "./index.d.ts",
 	"license": "ISC"
 }

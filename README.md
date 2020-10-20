@@ -18,6 +18,11 @@ $ npm i aw_form_elements_common
 También es posible instalar todo lo necesario para manejar los formularios de `aw` instalnado:
 
 ```
+$ npm i aw_form_elements
+```
+o
+
+```
 $ npm i aw_form_elements_df
 ```
 Esto instalará todo los campos y componentes necesarios para usar los `aw-form` incluidos los `aw-form-elements-common`.
@@ -26,7 +31,12 @@ Esto instalará todo los campos y componentes necesarios para usar los `aw-form`
 - <a href="https://www.npmjs.com/package/aw_form_elements_common" target="_blank">aw-form-elements-common</a>
 - <a href="https://www.npmjs.com/package/aw_button" target="_blank">aw-button</a>
 
-Para incluir este y todos los componentes de formularios disponibles, así como los `aw_form_elements_df`, `aw_button` y los `aw_form_elements_df`, bastará con añadir:
+Para incluir este y todos los componentes de formularios disponibles, así como los `aw_form_elements`, `aw_form_elements_df`, `aw_button` y los `aw_form_elements_df`, bastará con añadir:
+
+```html
+<script src="/node_modules/aw_form_elements/aw-form-elements.js"></script>
+```
+o
 
 ```html
 <script src="/node_modules/aw_form_elements_df/aw-form-elements-df.js"></script>
