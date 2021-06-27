@@ -1,18 +1,9 @@
 interface AwCheckbox extends HTMLElement
 {
 	inputElement: HTMLInputElement;
-
-	/**
-	 * @method	checked
-	 * 
-	 * Indica si el input está checkeado o no
-	 * 
-	 * @return {boolean}
-	 */
-	checked() : boolean;
-
 	/**
 	 * @method error_hide
+	 * @deprecated
 	 * 
 	 * Muestra u oculta un mensaje de error
 	 */
@@ -20,6 +11,7 @@ interface AwCheckbox extends HTMLElement
 
 	/**
 	 * @method error_show
+	 * @deprecated
 	 * 
 	 * Muestra u oculta un mensaje de error
 	 * 
@@ -29,6 +21,7 @@ interface AwCheckbox extends HTMLElement
 
 	/**
 	 * @method get_value
+	 * @deprecated
 	 * 
 	 * Obtiene el valor del input
 	 * 
@@ -38,12 +31,70 @@ interface AwCheckbox extends HTMLElement
 
 	/**
 	 * @method	has_error
+	 * @deprecated
 	 * 
 	 * Devuelve si el campo tiene un error
 	 * 
 	 * @return {boolean}
 	 */
 	has_error() : boolean;
+
+	/**
+	 * @method clear
+	 * 
+	 * Checkea el componente
+	 */
+	check() : void;
+
+	/**
+	 * @method clear
+	 * 
+	 * Quita el check del componente
+	 */
+	clear() : void;
+
+	/**
+	 * @method error_hide
+	 * 
+	 * Muestra u oculta un mensaje de error
+	 */
+	errorHide() : void;
+
+	/**
+	 * @method error_show
+	 * 
+	 * Muestra u oculta un mensaje de error
+	 * 
+	 * @param {string} message Mensaje de error que se va a mostrar
+	 */
+	errorShow( message: string ) : void;
+
+	/**
+	 * @method get_value
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	getValue() : string;
+
+	/**
+	 * @method	has_error
+	 * 
+	 * Devuelve si el campo tiene un error
+	 * 
+	 * @return {boolean}
+	 */
+	hasError() : boolean;
+	
+	/**
+	 * @method	isChecked
+	 * 
+	 * Indica si el input está checkeado o no
+	 * 
+	 * @return {boolean}
+	 */
+	isChecked() : boolean;
 }
 
 declare var AwCheckbox: {
