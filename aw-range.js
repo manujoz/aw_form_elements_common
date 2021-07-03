@@ -2,6 +2,25 @@ import { PolymerElement, html, Polymer } 	from "../aw_polymer_3/polymer/polymer-
 import { AwFormValidateMixin } 				from "../aw_form_mixins/aw-form-validate-mixin.js";
 import { AwExternsFunctionsMixin } 			from "../aw_extern_functions/aw-extern-functions-mixin.js";
 
+/**
+ * Componente de aw-range
+ * 
+ * @attr {String} connectedfunc
+ * @attr {String} changefunc
+ * @cssprop --aw-primary-color
+ * @cssprop --aw-error-color
+ * @cssprop --aw-input-range-bar-color
+ * @cssprop --aw-input-range-bg-color
+ * @cssprop --aw-input-range-color
+ * @cssprop --aw-input-range-font-size
+ * @cssprop --aw-input-range-font-weight
+ * @cssprop --aw-input-range-label-color
+ * @cssprop --aw-input-range-label-font-family
+ * @cssprop --aw-input-range-label-font-weight
+ * @cssprop --aw-input-range-label-text-align
+ * @cssprop --aw-input-range-line-color
+ * @cssprop --aw-input-range-value-padding
+ */
 class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerElement )) {
 	static get template() {
 		return html`
@@ -22,6 +41,9 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 				}
 				:host([unresolved]) {
 					display: none;
+				}
+				:host([fullwidth]) {
+					width: 100%;
 				}
 
 				#label {
@@ -91,9 +113,6 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 					border-radius: 50%;
 					background-color: var(--aw-input-range-bar-color,var(--aw-primary-color,#1C7CDD));
 					border: solid 3px var(--aw-input-range-bg-color, white);
-					-webkit-box-sizing: border-box;
-					-moz-box-sizing: border-box;
-					-ms-box-sizing: border-box;
 					box-sizing: border-box;
 					cursor: pointer;
 				}
@@ -110,9 +129,6 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 					font-size: var(--aw-input-range-font-size, 14px);
 					font-weight: var(--aw-input-range-font-weight, normal);
 					padding: var(--aw-input-range-value-padding, 0 0 2px 0);
-					-webkit-box-sizing: border-box;
-					-moz-box-sizing: border-box;
-					-ms-box-sizing: border-box;
 					box-sizing: border-box;
 					transition: color .3s;
 				}
@@ -148,34 +164,66 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 
 	static get properties() {
 		return {
-			// Elemento del input
-
-			inputElement: { type: Object, value: null },
-			input: { type: Boolean, value: false },
-			
-			// Elementos del slider
-			
-			contenedor: { type: Object, value: null },
-			bar: { type: Object, value: null },
-			slider: { type: Object, value: null },
-			divValue: { type: Object, value: null },
-			
 			// Atributos del input
+			// ......................
 			
-			id: { type: String, value: "" },
-			name: { type: String, value: "" },
+			/** Id del componente */
+			id: { type: String },
+			/** Nombre del componente */
+			name: { type: String },
+			/** Valor del componente */
 			value: { type: Number },
-			min: { type: Number, value: 0 },
-			max: { type: Number, value: 10 },
-			step: { type: Number, value: 1 },
-			label: { type: String, value: "" },
-			showvalue: { type: Boolean, value: false },
+			/** Valor mínimo del componente */
+			min: { type: Number },
+			/** Valor máximo del componente */
+			max: { type: Number },
+			/** Pasos al desplazar el slider */
+			step: { type: Number },
+			/** Label del componente */
+			label: { type: String },
+			/** Muestra el valor del componente */
+			showvalue: { type: Boolean },
+			/** Pone el componente en ancho completo */
+			fullwidth: { type: Boolean },
 
-			// Relación con el aw-form y el form
+			// Relación con el aw-form
+			// ........................
 
-			parentForm: Object,
-			noregister: { type: Boolean, value: false }
+			/** El componente no se registra en el formulario */
+			noregister: { type: Boolean }
 		};
+	}
+
+	constructor() {
+		super();
+
+		this.id = undefined;
+		this.name = undefined;
+		this.value = undefined;
+		this.min = 0;
+		this.max = 10;
+		this.step = 1;
+		this.fullwidth = false;
+		this.label = undefined;
+		this.showvalue = false;
+		this.noregister = false;
+
+		this.tracking = false;
+		/** @type {HTMLInputElement} */
+		this.inputElement = null;
+		/** @type {HTMLInputElement} */
+		this.input = null;
+		/** @type {AwForm} */
+		this.parentForm = undefined;
+		
+		/** @type {HTMLInputElement} */
+		this.contenedor = undefined;
+		/** @type {HTMLInputElement} */
+		this.bar = undefined;
+		/** @type {HTMLInputElement} */
+		this.slider = undefined;
+		/** @type {HTMLInputElement} */
+		this.divValue = undefined;
 	}
 
 	/**
@@ -200,7 +248,6 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		this.bar = this.$.bar;
 		this.slider = this.$.slider;
 		this.divValue = this.shadowRoot.querySelector( ".cont_value" );
-		this.tracking = false;
 		
 		// Ajustes del componente
 		
@@ -221,6 +268,12 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 		// Buscamos si tiene pertenee a un formulario
 
 		this._register_in_form();
+
+		// Invocamos la función externa connected
+
+		if ( typeof this.connectedfunc === "function" ) {
+			this.connectedfunc( this );
+		}
 		
 		// Resolvemos
 
@@ -253,6 +306,17 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 	 */
 	get_value()
 	{
+		return this.getValue();
+	}
+
+	/**
+	 * @method getValue
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	getValue() {
 		return this.inputElement.value;
 	}
 
@@ -386,7 +450,12 @@ class AwRange extends AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerEle
 
 		if( divs < ancho ) {
 			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
-			this.value = parseFloat((((this.left / anchoDiv) * this.step) + this.min).toFixed( 3 ));
+
+			if(this.step.toString().indexOf(".") === -1) {
+				this.value = parseFloat((((this.left / anchoDiv) * this.step) + this.min).toFixed( 0 ));
+			} else {
+				this.value = parseFloat((((this.left / anchoDiv) * this.step) + this.min).toFixed( 1 ));
+			}
 		} else {
 			let pixelValue = diff / ancho;
 			let value = (this.left * pixelValue) + this.min;

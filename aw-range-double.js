@@ -2,6 +2,25 @@ import { PolymerElement, html, Polymer } 	from "../aw_polymer_3/polymer/polymer-
 import { AwFormValidateMixin } 				from "../aw_form_mixins/aw-form-validate-mixin.js";
 import { AwExternsFunctionsMixin } 			from "../aw_extern_functions/aw-extern-functions-mixin.js";
 
+/**
+ * Componente de aw-range-doeble
+ * 
+ * @attr {String} connectedfunc
+ * @attr {String} changefunc
+ * @cssprop --aw-primary-color
+ * @cssprop --aw-error-color
+ * @cssprop --aw-input-range-bar-color
+ * @cssprop --aw-input-range-bg-color
+ * @cssprop --aw-input-range-color
+ * @cssprop --aw-input-range-font-size
+ * @cssprop --aw-input-range-font-weight
+ * @cssprop --aw-input-range-label-color
+ * @cssprop --aw-input-range-label-font-family
+ * @cssprop --aw-input-range-label-font-weight
+ * @cssprop --aw-input-range-label-text-align
+ * @cssprop --aw-input-range-line-color
+ * @cssprop --aw-input-range-value-padding
+ */
 class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( PolymerElement )) {
 	static get template() {
 		return html`
@@ -22,6 +41,9 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 				}
 				:host([unresolved]) {
 					display: none;
+				}
+				:host([fullwidth]) {
+					width: 100%;
 				}
 
 				#label {
@@ -165,38 +187,71 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 
 	static get properties() {
 		return {
-			// Elemento del input
-
-			inputElement: { type: Object, value: null },
-			input: { type: Boolean, value: false },
-			
-			// Elementos del slider
-			
-			contenedor: { type: Object, value: null },
-			bar: { type: Object, value: null },
-			slider_1: { type: Object, value: null },
-			slider_2: { type: Object, value: null },
-			divValue_1: { type: Object, value: null },
-			divValue_2: { type: Object, value: null },
-			val1: { type: Number },
-			val2: { type: Number },
-			
 			// Atributos del input
+			// ......................
 			
-			id: { type: String, value: "" },
-			name: { type: String, value: "" },
-			value: { type: String },
-			min: { type: Number, value: 0 },
-			max: { type: Number, value: 10 },
-			step: { type: Number, value: 1 },
-			label: { type: String, value: "" },
-			showvalue: { type: Boolean, value: false },
+			/** Id del componente */
+			id: { type: String },
+			/** Nombre del componente */
+			name: { type: String },
+			/** Valor del componente */
+			value: { type: Number },
+			/** Valor mínimo del componente */
+			min: { type: Number },
+			/** Valor máximo del componente */
+			max: { type: Number },
+			/** Pasos al desplazar el slider */
+			step: { type: Number },
+			/** Label del componente */
+			label: { type: String },
+			/** Muestra el valor del componente */
+			showvalue: { type: Boolean },
+			/** Pone el componente en ancho completo */
+			fullwidth: { type: Boolean },
 
-			// Relación con el aw-form y el form
+			// Relación con el aw-form
+			// ........................
 
-			parentForm: Object,
-			noregister: { type: Boolean, value: false }
+			/** El componente no se registra en el formulario */
+			noregister: { type: Boolean }
 		}
+	}
+
+	constructor() {
+		super();
+
+		this.id = undefined;
+		this.name = undefined;
+		this.value = undefined;
+		this.min = 0;
+		this.max = 10;
+		this.step = 1;
+		this.fullwidth = false;
+		this.label = undefined;
+		this.showvalue = false;
+		this.noregister = false;
+
+		this.val1 = undefined;
+		this.val2 = undefined;
+		
+		/** @type {HTMLInputElement} */
+		this.inputElement = null;
+		/** @type {HTMLInputElement} */
+		this.input = null;
+		/** @type {AwForm} */
+		this.parentForm = undefined;
+		/** @type {HTMLInputElement} */
+		this.contenedor = undefined;
+		/** @type {HTMLInputElement} */
+		this.bar = undefined;
+		/** @type {HTMLInputElement} */
+		this.slider_1 = undefined;
+		/** @type {HTMLInputElement} */
+		this.slider_2 = undefined;
+		/** @type {HTMLInputElement} */
+		this.divValue_1 = undefined;
+		/** @type {HTMLInputElement} */
+		this.divValue_2 = undefined;
 	}
 	
 	/**
@@ -244,6 +299,12 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 		// Buscamos si tiene pertenee a un formulario
 
 		this._register_in_form();
+
+		// Invocamos la función externa connected
+
+		if ( typeof this.connectedfunc === "function" ) {
+			this.connectedfunc( this );
+		}
 		
 		// Resolvemos
 
@@ -443,8 +504,14 @@ class AwRangeDouble extends AwFormValidateMixin( AwExternsFunctionsMixin( Polyme
 			anchoDiv = parseFloat((( ancho / diff ) * this.step ).toFixed( 3 ));
 
 			// Calculamos los valores en función al ancho de la división
-			this.val1 = parseFloat((((this.left1 / anchoDiv) * this.step) + this.min).toFixed( 3 ));
-			this.val2 = parseFloat((((this.left2 / anchoDiv) * this.step) + this.min).toFixed( 3 ));
+			
+			if(this.step.toString().indexOf(".") === -1) {
+				this.val1 = parseFloat((((this.left1 / anchoDiv) * this.step) + this.min).toFixed( 0 ));
+				this.val2 = parseFloat((((this.left2 / anchoDiv) * this.step) + this.min).toFixed( 0 ));
+			} else {
+				this.val1 = parseFloat((((this.left1 / anchoDiv) * this.step) + this.min).toFixed( 1 ));
+				this.val2 = parseFloat((((this.left2 / anchoDiv) * this.step) + this.min).toFixed( 1 ));
+			}
 		} else {
 			// Obtenemos el valor del pixel
 			let pixelValue = diff / ancho;
