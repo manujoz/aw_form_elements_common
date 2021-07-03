@@ -5,6 +5,42 @@ import { AwExternsFunctionsMixin } 		from "../aw_extern_functions/aw-extern-func
 
 import "../aw_form_helpers/aw-input-error.js";
 
+/**
+ * Componente de checkbox
+ * 
+ * @attr {Boolean} error
+ * @attr {String} errmsg
+ * @attr {Boolean} noerrors
+ * @attr {String} connectedfunc
+ * @attr {String} clickfunc
+ * @attr {String} changefunc
+ * @cssprop --aw-primary-color
+ * @cssprop --aw-primary-text-color
+ * @cssprop --aw-error-color
+ * @cssprop --aw-checkbox-background-color
+ * @cssprop --aw-checkbox-border-color
+ * @cssprop --aw-checkbox-checked-border-color
+ * @cssprop --aw-checkbox-checked-color
+ * @cssprop --aw-checkbox-disabled-color
+ * @cssprop --aw-checkbox-icon-color
+ * @cssprop --aw-checkbox-label-big-padding
+ * @cssprop --aw-checkbox-label-color
+ * @cssprop --aw-checkbox-label-font-size
+ * @cssprop --aw-checkbox-label-font-style
+ * @cssprop --aw-checkbox-label-font-weight
+ * @cssprop --aw-checkbox-label-margin
+ * @cssprop --aw-checkbox-label-padding
+ * @cssprop --aw-checkbox-label-small-padding
+ * @cssprop --aw-checkbox-label-text-align
+ * @cssprop --aw-checkbox-subtitle-big-padding
+ * @cssprop --aw-checkbox-subtitle-border
+ * @cssprop --aw-checkbox-subtitle-color
+ * @cssprop --aw-checkbox-subtitle-margin
+ * @cssprop --aw-checkbox-subtitle-padding
+ * @cssprop --aw-checkbox-subtitle-size
+ * @cssprop --aw-checkbox-subtitle-small-padding
+ * @cssprop --aw-checkbox-subtitle-text-align
+ */
 class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerElement ))) {
 	static get template() {
 		return html`
@@ -23,6 +59,9 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 				}
 				:host([unresolved]) {
 					display: none;
+				}
+				:host([fullwidth]) {
+					width: 100%;
 				}
 				
 				/* INPUT OCULTO */
@@ -103,6 +142,14 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 					font-weight: var(--aw-checkbox-label-font-weight,300);
 					text-align: var(--aw-checkbox-label-text-align,left);
 				}
+				#label[size="small"] {
+					font-size: 12px;
+					padding: var(--aw-checkbox-label-small-padding,4px 0 0 6px);
+				}
+				#label[size="big"] {
+					font-size: 18px;
+					padding: var(--aw-checkbox-label-big-padding,0 0 0 6px);
+				}
 				#label[error] {
 					color: var(--aw-input-error-color,var(--aw-error-color,#b13033));
 				}
@@ -117,6 +164,14 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 					font-size: var(--aw-checkbox-subtitle-size,12px);
 					color: var(--aw-checkbox-subtitle-color,#888888);
 					text-align: var(--aw-checkbox-subtitle-text-align,left);
+				}
+				#subtitle[size="small"] {
+					font-size: 12px;
+					padding: var(--aw-checkbox-subtitle-small-padding,4px 0 0 6px);
+				}
+				#subtitle[size="big"] {
+					font-size: 18px;
+					padding: var(--aw-checkbox-subtitle-big-padding,0 0 0 6px);
 				}
 				#subtitle[error] {
 					color: var(--aw-input-error-color,var(--aw-error-color,#b13033));
@@ -151,8 +206,8 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 						</div>
 					</div>
 					<div>
-						<div id="label" hidden="{{!label}}">{{label}}</div>
-						<div id="subtitle" hidden="{{!subtitle}}">{{subtitle}}</div>
+						<div id="label" hidden="{{!label}}" size$="[[size]]">{{label}}</div>
+						<div id="subtitle" hidden="{{!subtitle}}" size$="[[size]]">{{subtitle}}</div>
 					</div>
 				</div>
 			</div>
@@ -162,39 +217,71 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 
 	static get properties() {
 		return {
-			// Elementos del input
-
-			inputElement: { type: Object, value: null },
-			checkbox: { type: Object, value: null },
-			input: { type: Boolean, value: false },
-			
 			// Atributos del checkbox
+			// ......................
 			
-			id: { type: String, value: "" },
-			name: { type: String, value: "" },
-			value: { type: String, value: "" },
-			checked: {type: Boolean, value: false },
-			disabled: {type: Boolean, value: false, observer: "_setDisabled"},
-			label : { type: String, value: "" },
-			subtitle: { type: String, value: "" },
-			
-			// Observer
-			
-			observerCheck: { type: Object, value: null },
+			/** Id del componente */
+			id: { type: String },
+			/** Nombre del componente */
+			name: { type: String },
+			/** Valor del componente */
+			value: { type: String },
+			/** Estado del checkbox */
+			checked: {type: Boolean },
+			/** Desactiva el componente */
+			disabled: {type: Boolean },
+			/**
+			 * Tamaño del input
+			 * @type {"big"|"small"}
+			 */
+			size: { type: String, reflectToAttribute: true },
+			/** Pone el botón en ancho completo */
+			fullwidth: { type: Boolean, reflectToAttribute: true },
 
 			// Atributos de validación
+			// ........................
 
-			required: { type: Boolean, value: false },
-			checkgroup: { type: String, value: "" },
-			mincheck: { type: String, value: "" },
-			maxcheck: { type: String, value: "" },
-			novalidate: { type: Boolean, value: false },
+			/** Indica que este campo es obligatorio */
+			required: { type: Boolean },
+			/** Nombre del grupo, para determinar los mincheck o maxcheck. El nombre puede ser cualquiera */
+			checkgroup: { type: Number },
+			/** Mínimo de checkbox que tienen que estar checkados en el grupo */
+			mincheck: { type: Number },
+			/** Máximo de checkbox que tienen que estar checkados en el grupo */
+			maxcheck: { type: String },
+			/** Evita la validación del checkbox */
+			novalidate: { type: Boolean },
 
-			// Relación con el aw-form y el form
+			// Relación con el aw-form
+			// .......................
 
-			parentForm: Object,
-			noregister: { type: Boolean, value: false }
+			/** El checkbox no es registrado en el formulario */
+			noregister: { type: Boolean }
 		}
+	}
+	
+	constructor() {
+		super();
+
+		this.id = undefined;
+		this.name = undefined;
+		this.value = undefined;
+		this.checked = false;
+		this.disabled = false;
+		this.label = false;
+		this.subtitle = false;
+		this.noregister = false;
+		
+		/** @type {HTMLInputElement} */
+		this.inputElement = null;
+		/** @type {HTMLInputElement} */
+		this.input = null;
+		/** @type {HTMLInputElement} */
+		this.checkbox = null;
+		/** @type {MutationObserver} */
+		this.observerCheck = undefined;
+		/** @type {AwForm} */
+		this.parentForm = undefined;
 	}
 	
 	/**
@@ -256,19 +343,37 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	}
 
 	/**
-	 * @method	checked
+	 * @method	check
 	 * 
-	 * Indica si el input está checkeado o no
-	 * 
-	 * @return {boolean}
+	 * Pone el checkbox como checkeado
 	 */
-	checked()
-	{
-		if( this.inputElement.hasAttribute( "checked" )) {
-			return true;
-		} else {
-			return false;
+	check() {
+		if(this.checked) {
+			return;
 		}
+
+		if( !this.hasAttribute( "checked" )) {
+			this.setAttribute( "checked", "" );
+		}
+
+		this.checked = true;
+	}
+
+	/**
+	 * @method	clear
+	 * 
+	 * Pone el checkbox como checkeado
+	 */
+	clear() {
+		if(!this.checked) {
+			return;
+		}
+
+		if( this.hasAttribute( "checked" )) {
+			this.removeAttribute( "checked" );
+		}
+		
+		this.checked = false;
 	}
 
 	/**
@@ -278,7 +383,29 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	 */
 	error_hide()
 	{
+		this.errorHide();
+	}
+
+	/**
+	 * @method errorHide
+	 * 
+	 * Muestra u oculta un mensaje de error
+	 */
+	errorHide()
+	{
 		this.inputElement.setAttribute( "errmsg", "" );
+	}
+
+	 /**
+	  * @method error_show
+	  * @deprecated
+	  * 
+	  * Muestra u oculta un mensaje de error
+	  * 
+	  * @param {string} message Mensaje de error que se va a mostrar
+	  */
+	error_show( message ) {
+		this.errorShow(message);
 	}
 
 	/**
@@ -288,13 +415,14 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	 * 
 	 * @param {string} message Mensaje de error que se va a mostrar
 	 */
-	error_show( message )
+	errorShow( message )
 	{
 		this.inputElement.setAttribute( "errmsg", message );
 	}
 
 	/**
 	 * @method get_value
+	 * @deprecated
 	 * 
 	 * Obtiene el valor del input
 	 * 
@@ -302,11 +430,24 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	 */
 	get_value()
 	{
+		return this.getValue();
+	}
+
+	/**
+	 * @method getValue
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	getValue()
+	{
 		return this.inputElement.value;
 	}
 
 	/**
 	 * @method	has_error
+	 * @deprecated
 	 * 
 	 * Devuelve si el campo tiene un error
 	 * 
@@ -314,7 +455,35 @@ class AwRadio extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	 */
 	has_error()
 	{
+		return this.hasError();
+	}
+
+	/**
+	 * @method	hasError
+	 * 
+	 * Devuelve si el campo tiene un error
+	 * 
+	 * @return {boolean}
+	 */
+	hasError()
+	{
 		if( this.inputElement.getAttribute( "errmsg" )) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @method	isChecked
+	 * 
+	 * Indica si el input está checkeado o no
+	 * 
+	 * @return {boolean}
+	 */
+	isChecked()
+	{
+		if( this.inputElement.hasAttribute( "checked" )) {
 			return true;
 		} else {
 			return false;

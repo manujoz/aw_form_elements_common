@@ -1,43 +1,10 @@
 interface AwCheckbox extends HTMLElement
 {
 	inputElement: HTMLInputElement;
-	/**
-	 * @method error_hide
-	 * @deprecated
-	 * 
-	 * Muestra u oculta un mensaje de error
-	 */
-	error_hide() : void;
-
-	/**
-	 * @method error_show
-	 * @deprecated
-	 * 
-	 * Muestra u oculta un mensaje de error
-	 * 
-	 * @param {string} message Mensaje de error que se va a mostrar
-	 */
-	error_show( message: string ) : void;
-
-	/**
-	 * @method get_value
-	 * @deprecated
-	 * 
-	 * Obtiene el valor del input
-	 * 
-	 * @return {string}
-	 */
-	get_value() : string;
-
-	/**
-	 * @method	has_error
-	 * @deprecated
-	 * 
-	 * Devuelve si el campo tiene un error
-	 * 
-	 * @return {boolean}
-	 */
-	has_error() : boolean;
+	checked: boolean;
+	connectedfunc: Function;
+	changefunc: Function;
+	clickfunc: Function;
 
 	/**
 	 * @method clear
@@ -105,22 +72,31 @@ declare var AwCheckbox: {
 interface AwRadio extends HTMLElement
 {
 	inputElement: HTMLInputElement;
+	checked: boolean;
+	connectedfunc: Function;
+	changefunc: Function;
+	clickfunc: Function;
 
 	/**
-	 * @method	checked
+	 * @method clear
 	 * 
-	 * Indica si el input está checkeado o no
-	 * 
-	 * @return {boolean}
+	 * Checkea el componente
 	 */
-	checked() : boolean;
+	check() : void;
+
+	/**
+	 * @method clear
+	 * 
+	 * Quita el check del componente
+	 */
+	clear() : void;
 
 	/**
 	 * @method error_hide
 	 * 
 	 * Muestra u oculta un mensaje de error
 	 */
-	error_hide() : void;
+	errorHide() : void;
 
 	/**
 	 * @method error_show
@@ -129,7 +105,7 @@ interface AwRadio extends HTMLElement
 	 * 
 	 * @param {string} message Mensaje de error que se va a mostrar
 	 */
-	error_show( message: string ) : void;
+	errorShow( message: string ) : void;
 
 	/**
 	 * @method get_value
@@ -138,7 +114,7 @@ interface AwRadio extends HTMLElement
 	 * 
 	 * @return {string}
 	 */
-	get_value() : string;
+	getValue() : string;
 
 	/**
 	 * @method	has_error
@@ -147,7 +123,16 @@ interface AwRadio extends HTMLElement
 	 * 
 	 * @return {boolean}
 	 */
-	has_error() : boolean;
+	hasError() : boolean;
+	
+	/**
+	 * @method	isChecked
+	 * 
+	 * Indica si el input está checkeado o no
+	 * 
+	 * @return {boolean}
+	 */
+	isChecked() : boolean;
 }
 
 declare var AwRadio: {
@@ -158,6 +143,23 @@ declare var AwRadio: {
 interface AwOnOff extends HTMLElement
 {
 	inputElement: HTMLInputElement;
+	connectedfunc: Function;
+	changefunc: Function;
+	clickfunc: Function;
+
+	/**
+	 * @method clear
+	 * 
+	 * Checkea el componente
+	 */
+	check() : void;
+
+	/**
+	 * @method clear
+	 * 
+	 * Quita el check del componente
+	 */
+	clear() : void;
 
 	/**
 	 * @method	checked
@@ -166,7 +168,7 @@ interface AwOnOff extends HTMLElement
 	 * 
 	 * @return {boolean}
 	 */
-	checked() : boolean;
+	isChecked() : boolean;
 
 	/**
 	 * @method get_value
@@ -175,7 +177,7 @@ interface AwOnOff extends HTMLElement
 	 * 
 	 * @return {string}
 	 */
-	get_value() : string;
+	getValue() : string;
 }
 
 declare var AwOnOff: {
@@ -186,15 +188,13 @@ declare var AwOnOff: {
 interface AwRange extends HTMLElement
 {
 	inputElement: HTMLInputElement;
+	connectedfunc: Function;
+	changefunc: Function;
 
 	/**
-	 * @method get_value
-	 * 
 	 * Obtiene el valor del input
-	 * 
-	 * @return {string}
 	 */
-	get_value() : string;
+	getValue() : string;
 }
 
 declare var AwRange: {
@@ -205,6 +205,8 @@ declare var AwRange: {
 interface AwRangeDoble extends HTMLElement
 {
 	inputElement: HTMLInputElement;
+	connectedfunc: Function;
+	changefunc: Function;
 
 	/**
 	 * @method get_value
@@ -213,7 +215,7 @@ interface AwRangeDoble extends HTMLElement
 	 * 
 	 * @return {string} Ex.: 4-20
 	 */
-	get_value() : string;
+	getValue() : string;
 }
 
 declare var AwRangeDoble: {
@@ -224,6 +226,8 @@ declare var AwRangeDoble: {
 interface AwSelectable extends HTMLElement
 {
 	inputElement: HTMLInputElement;
+	connectedfunc: Function;
+	changefunc: Function;
 
 	/**
 	 * @method	checked
@@ -241,19 +245,10 @@ interface AwSelectable extends HTMLElement
 	 * 
 	 * @return {string}
 	 */
-	get_value() : string;
+	getValue() : string;
 }
 
 declare var AwSelectable: {
 	prototype: AwSelectable,
 	new(): AwSelectable
-}
-
-interface HTMLElementTagNameMap {
-	"aw-checkbox": AwCheckbox;
-	"aw-radio": AwRadio;
-	"aw-onoff": AwOnOff;
-	"aw-range": AwRange;
-	"aw-range-double": AwRangeDoble;
-	"aw-selectable": AwSelectable;
 }

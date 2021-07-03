@@ -5,6 +5,20 @@ import { AwExternsFunctionsMixin } 		from "../aw_extern_functions/aw-extern-func
 
 import "../aw_form_helpers/aw-input-error.js";
 
+/**
+ * Componente on-off
+ * 
+ * @attr {Boolean} error
+ * @attr {String} errmsg
+ * @attr {Boolean} noerrors
+ * @attr {String} connectedfunc
+ * @attr {String} clickfunc
+ * @attr {String} changefunc
+ * @cssprop --aw-input-onoff-bg-off
+ * @cssprop --aw-input-onoff-bt-off
+ * @cssprop --aw-input-onoff-bg-on
+ * @cssprop --aw-input-onoff-bt-on
+ */
 class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerElement ))) {
 	static get template() {
 		return html`
@@ -77,35 +91,53 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	
 	static get properties() {
 		return {
-			// Elementos del input
-
-			inputElement: { type: Object, value: null },
-			input: { type: Boolean, value: false },
-			
 			// Atributos del checkbox
 			
-			id: { type: String, value: "" },
-			name: { type: String, value: "" },
-			value: { type: String, value: "" },
-			checked: {type: Boolean, value: false },
-			disabled: {type: Boolean, value: false },
-			subtitle: { type: String, value: "" },
-		
-			// Observer
-			
-			observerCheck: { type: Object, value: null },
-			observerDisabled: { type: Object, value: null },
+			/** Id del componente */
+			id: { type: String },
+			/** Nombre del componente */
+			name: { type: String },
+			/** Valor del componente */
+			value: { type: String },
+			/** Estado del componente */
+			checked: {type: Boolean },
+			/** Desactiva el componente */
+			disabled: {type: Boolean },
+
+			// Relación con el aw-form
+
+			/** No registra el compoennte en el formulario */
+			noregister: { type: Boolean },
 
 			// Atributos de validación
 
-			required: { type: Boolean, value: false },
-			novalidate: { type: Boolean, value: false },
-
-			// Relación con el aw-form y el form
-
-			parentForm: Object,
-			noregister: { type: Boolean, value: false }
+			/** Indica que este componente es obligatorio */
+			required: { type: Boolean },
+			/** No valida el componente */
+			novalidate: { type: Boolean },
 		};
+	}
+
+	constructor() {
+		super();
+
+		this.id = undefined;
+		this.name = undefined;
+		this.value = undefined;
+		this.checked = false;
+		this.disabled = false;
+		this.noregister = false;
+
+		/** @type {HTMLInputElement} */
+		this.inputElement = null;
+		/** @type {HTMLInputElement} */
+		this.input = null;
+		/** @type {MutationObserver} */
+		this.observerCheck = undefined;
+		/** @type {MutationObserver} */
+		this.observerDisabled = undefined;
+		/** @type {AwForm} */
+		this.parentForm = undefined;
 	}
 
 	/**
@@ -149,6 +181,12 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 		// Marcamos como disabled si corresponde
 
 		this._setDisabled();
+
+		// Invocamos la función externa connected
+
+		if ( typeof this.connectedfunc === "function" ) {
+			this.connectedfunc( this );
+		}
 		
 		// Resolvemos
 
@@ -176,13 +214,47 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	}
 
 	/**
+	 * @method	check
+	 * 
+	 * Pone el checkbox como checkeado
+	 */
+	check() {
+		if(this.checked) {
+			return;
+		}
+
+		if( !this.hasAttribute( "checked" )) {
+			this.setAttribute( "checked", "" );
+		}
+
+		this.checked = true;
+	}
+
+	/**
+	 * @method	clear
+	 * 
+	 * Pone el checkbox como checkeado
+	 */
+	clear() {
+		if(!this.checked) {
+			return;
+		}
+
+		if( this.hasAttribute( "checked" )) {
+			this.removeAttribute( "checked" );
+		}
+		
+		this.checked = false;
+	}
+
+	/**
 	 * @method	checked
 	 * 
 	 * Indica si el input está checkeado o no
 	 * 
 	 * @return {boolean}
 	 */
-	checked()
+	isChecked()
 	{
 		if( this.inputElement.hasAttribute( "checked" )) {
 			return true;
@@ -193,6 +265,7 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 
 	/**
 	 * @method get_value
+	 * @deprecated
 	 * 
 	 * Obtiene el valor del input
 	 * 
@@ -200,6 +273,17 @@ class AwOnOff extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunction
 	 */
 	get_value()
 	{
+		return this.getValue()
+	}
+
+	/**
+	 * @method getValue
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	getValue() {
 		return this.inputElement.value;
 	}
 

@@ -5,6 +5,46 @@ import { AwExternsFunctionsMixin } 		from "../aw_extern_functions/aw-extern-func
 
 import "../aw_form_helpers/aw-input-error.js";
 
+/**
+ * Componente selectable
+ * 
+ * @attr {Boolean} error
+ * @attr {String} errmsg
+ * @attr {Boolean} noerrors
+ * @attr {String} connectedfunc
+ * @attr {String} changefunc
+ * @cssprop --aw-primary-color
+ * @cssprop --aw-error-color
+ * @cssprop --aw-selectable-background-color
+ * @cssprop --aw-selectable-border
+ * @cssprop --aw-selectable-border-radius
+ * @cssprop --aw-selectable-box-shadow
+ * @cssprop --aw-selectable-duration
+ * @cssprop --aw-selectable-effect-background-color
+ * @cssprop --aw-selectable-height
+ * @cssprop --aw-selectable-mark-background-color
+ * @cssprop --aw-selectable-mark-borde
+ * @cssprop --aw-selectable-mark-box-shadow
+ * @cssprop --aw-selectable-mark-width
+ * @cssprop --aw-selectable-off-background-color
+ * @cssprop --aw-selectable-off-color
+ * @cssprop --aw-selectable-off-effect-intensity
+ * @cssprop --aw-selectable-off-font-size
+ * @cssprop --aw-selectable-off-font-weight
+ * @cssprop --aw-selectable-off-text-align
+ * @cssprop --aw-selectable-on-background-color
+ * @cssprop --aw-selectable-on-color
+ * @cssprop --aw-selectable-on-effect-intensity
+ * @cssprop --aw-selectable-on-font-size
+ * @cssprop --aw-selectable-on-font-weight
+ * @cssprop --aw-selectable-on-text-align
+ * @cssprop --aw-selectable-tag-color
+ * @cssprop --aw-selectable-tag-font-size
+ * @cssprop --aw-selectable-tag-font-weight
+ * @cssprop --aw-selectable-tag-padding
+ * @cssprop --aw-selectable-tag-text-align
+ * @cssprop --aw-selectable-width
+ */
 class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFunctionsMixin ( PolymerElement ))) 
 {
 	static get template() {
@@ -71,7 +111,7 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 					flex-basis: 0;
 					white-space: nowrap;
 					color: var(--aw-selectable-tag-color);
-					font-size: var(--aw-selectable-tag-font-size);
+					font-size: var(--aw-selectable-tag-font-size, 14px);
 					font-weight: var(--aw-selectable-tag-font-weight);
 					padding: var(--aw-selectable-tag-padding,0 7px 0 0);
 					text-align: var(--aw-selectable-tag-text-align,left);
@@ -79,6 +119,12 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 					flex-flow: row wrap;
 					align-items: center;
 					justify-content: flex-start;
+				}
+				#tag[size=small] {
+					font-size: 12px;
+				}
+				#tag[size=big] {
+					font-size: 18px;
 				}
 				
 				/* #region Selectable */
@@ -188,7 +234,7 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 			</style>
 			<div id="label" hidden="{{!label}}">{{label}}</div>
 			<div class="container">
-				<div id="tag" hidden="{{!tag}}">{{tag}}</div>
+				<div id="tag" size$="[[size]]" hidden="{{!tag}}">{{tag}}</div>
 				<div class="selectable" checked$="{{checked}}" on-click="_click">
 					<div class="inner">
 						<div class="on"><span hidden="{{!ontext}}">{{ontext}}</span></div>
@@ -211,42 +257,75 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 	
 	static get properties() {
 		return {
-			// Elementos del input
-
-			inputElement: { type: Object, value: null },
-			input: { type: Boolean, value: false },
+			// Atributos del selectable
+			// ..........................
 			
-			// Atributos del checkbox
-			
+			/** Id del componente */
 			id: { type: String, value: "" },
+			/** Nombre del componente */
 			name: { type: String, value: "" },
+			/** Valor del componente */
 			value: { type: String, value: "" },
+			/** Estado del componente */
 			checked: {type: Boolean, value: false },
+			/** Desactiva el componente */
 			disabled: {type: Boolean, value: false },
-			subtitle: { type: String, value: "" },
 
 			// Atributos de diseño
+			// ..........................
 
+			/** Label del componente */
 			label: { type: String },
+			/** Etiqueta del componente */
 			tag: { type: String },
+			/** Texto cuando está activo */
 			ontext: { type: String, value: "" },
+			/** Texto cuando está inactivo */
 			offtext: { type: String, value: "" },
-		
-			// Observer
-			
-			observerCheck: { type: Object, value: null },
-			observerDisabled: { type: Object, value: null },
+			/**
+			 * Tamaño del input
+			 * @type {"big"|"small"}
+			 */
+			size: { type: String, reflectToAttribute: true },
 
 			// Atributos de validación
 
+			/** Indica que es obligatorio */
 			required: { type: Boolean, value: false },
+			/** No valida el componente */
 			novalidate: { type: Boolean, value: false },
 
-			// Relación con el aw-form y el form
+			// Relación con el aw-form
+			// ..........................
 
-			parentForm: Object,
+			/** El componente no se registras en el formmulario */
 			noregister: { type: Boolean, value: false }
 		};
+	}
+
+	constructor() {
+		super();
+
+		this.id = undefined;
+		this.name = undefined;
+		this.value = undefined;
+		this.checked = false;
+		this.disabled = false;
+		this.label = undefined;
+		this.tag = "";
+		this.ontext = "";
+		this.offtext = "";
+
+		/** @type {HTMLInputElement} */
+		this.inputElement = null;
+		/** @type {HTMLInputElement} */
+		this.input = null;
+		/** @type {MutationObserver} */
+		this.observerCheck = undefined;
+		/** @type {MutationObserver} */
+		this.observerDisabled = undefined;
+		/** @type {AwForm} */
+		this.parentForm = undefined;
 	}
 
 	/**
@@ -286,6 +365,12 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 		// Marcamos como disabled si corresponde
 
 		this._setDisabled();
+
+		// Invocamos la función externa connected
+
+		if ( typeof this.connectedfunc === "function" ) {
+			this.connectedfunc( this );
+		}
 		
 		// Resolvemos
 
@@ -313,13 +398,48 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 	}
 
 	/**
+	 * @method	check
+	 * 
+	 * Pone el checkbox como checkeado
+	 */
+	check() {
+		if(this.checked) {
+			return;
+		}
+
+		if( !this.hasAttribute( "checked" )) {
+			this.setAttribute( "checked", "" );
+		}
+
+		this.checked = true;
+	}
+
+	/**
+	 * @method	clear
+	 * 
+	 * Pone el checkbox como checkeado
+	 */
+	clear() {
+		if(!this.checked) {
+			return;
+		}
+
+		if( this.hasAttribute( "checked" )) {
+			this.removeAttribute( "checked" );
+		}
+		
+		this.checked = false;
+	}
+
+
+	/**
 	 * @method	checked
 	 * 
 	 * Indica si el input está checkeado o no
 	 * 
 	 * @return {boolean}
 	 */
-	checked()
+	isChecked()
 	{
 		if( this.inputElement.hasAttribute( "checked" )) {
 			return true;
@@ -330,12 +450,25 @@ class AwSelectable extends AwInputErrorMixin( AwFormValidateMixin ( AwExternsFun
 
 	/**
 	 * @method get_value
+	 * @deprecated
 	 * 
 	 * Obtiene el valor del input
 	 * 
 	 * @return {string}
 	 */
 	get_value()
+	{
+		return this.getValue();
+	}
+
+	/**
+	 * @method getValue
+	 * 
+	 * Obtiene el valor del input
+	 * 
+	 * @return {string}
+	 */
+	getValue()
 	{
 		return this.inputElement.value;
 	}
